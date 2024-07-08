@@ -3,21 +3,12 @@
 from xled.discover import discover
 from xled.control import ControlInterface
 import pygame
-from pygame.locals import (
-    K_UP,
-    K_DOWN,
-    K_LEFT,
-    K_RIGHT,
-    K_ESCAPE,
-    KEYDOWN,
-    QUIT,
-)
+from pygame.locals import QUIT
 from random import choice, randint
 from test import panels
 
 
 BACKGROUND = 'img/firefly-jar.png'
-FF_COLOR = (0xff, 0xff, 0xff)
 EMPTY = (127, 176, 191, 255)  # Jar bgcolor
 FIREFLIES = 20
 
@@ -48,13 +39,8 @@ class Firefly:
 
 
 def display(im, disp, coords):
-    #raw = im.tobytes()
-    print('TYPE:', type(im))
-    print('TYPE:', type(im.get_view('3')))
-    print('pixel size', im.get_bytesize())
     raw = im.get_view('3')
     raw = pygame.image.tostring(im, 'RGB') 
-    print('TYPE:', raw) 
     out = panels(raw)
     disp.set_rt_frame_rest(out)
 
@@ -67,12 +53,10 @@ def main():
 
     d = a.get_led_layout().data
     coords = d['coordinates']
-    clock = pygame.time.Clock() 
+    clock = pygame.time.Clock()
     screen = pygame.display.set_mode([24, 24], flags=pygame.SCALED)
     bg = pygame.image.load(BACKGROUND)
-    pygame.key.set_repeat(10, 10)
     running = True
-    x = y = 5  # coords of circle
     fireflies = [Firefly() for i in range(FIREFLIES)]
     while running:
         for event in pygame.event.get():
