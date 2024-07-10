@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-from xled.discover import discover
-from xled.control import ControlInterface
 import pygame
 from pygame.locals import QUIT
 from random import choice, randint
+from xled.control import ControlInterface
+from xled.discover import discover
+
 from test import panels
 
 
@@ -13,15 +14,16 @@ EMPTY = (127, 176, 191, 255)  # Jar bgcolor
 FIREFLIES = 20
 
 
-def ff_rgb():
-    return randint(255-150, 255)
+def ff_rgb(color_range=150):
+    """Choose a random firefly color."""
+    return tuple(randint(255 - color_range, 255) for i in range(3))
 
 
 class Firefly:
     def __init__(self):
         self.x = 13
         self.y = 13
-        self.color = (ff_rgb(), ff_rgb(), ff_rgb()) 
+        self.color = ff_rgb()
 
     def move(self, screen):
         adj = [(self.x, self.y)]
@@ -29,7 +31,6 @@ class Firefly:
             for j in (-1, 0, 1):
                 pos = (self.x + i, self.y + j)
                 col = screen.get_at(pos)
-                #print('DEBUG:', col)
                 if col == EMPTY:
                     adj.append(pos)
         self.x, self.y = choice(adj)

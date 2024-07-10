@@ -2,13 +2,11 @@
 
 import io
 from math import floor
-from xled.discover import discover
-from xled.control import ControlInterface
-
 from PIL import Image
 from random import shuffle
 from time import sleep
-#import pygame
+from xled.control import ControlInterface
+from xled.discover import discover
 
 
 out = b'\x00' * 8*8*9*3
@@ -20,19 +18,13 @@ def frame(n):
     return io.BytesIO(tmp)
 
 
-def xframe(n):
-    n = n*9
-    # tmp = out[:n] + b'\x18\x9B\xCC\x00\x00\x00\x10\x10\x44' + out[(n+9):]
-    tmp = out[:n] + b'\x70\x00\x70\x00\x00\x00\x11\x02\x43' + out[(n+9):]
-    return io.BytesIO(tmp)
-
 def get_pos(panel, coords):
     pos = 8*8*panel
     a.set_mode('rt')
     a.set_rt_frame_rest(frame(pos))
     x = floor(coords[pos]['x']*3)
     y = floor(coords[pos]['y']*6)
-    print(x, y)
+    #print(x, y)
 
 
 def corner_loops(coords):
@@ -63,7 +55,13 @@ def rotate(panel, r):
     return panel
 
 
-def sort_panels(panels, order=None):
+def sort_panels(panels: list, order=None) -> list:
+    """
+    Arrange (sort and rotate) panels based on the physical
+    configuration of the separate Twinkly squares.
+    TODO: This is hardcoded to one specifc config!
+          Use the device supplied configuration
+    """
     #        *     *  *
     order = [1, 2, 3, 0, 6, 7, 4, 5, 8]
     rot   = [0, -1, 1, 0, -1, 1, -1, -1, 2]
@@ -73,28 +71,30 @@ def sort_panels(panels, order=None):
     return sort
 
 
-def panels(im:bytes) -> list:
-    # split bytes into 8x8 panels
+def panels(im:bytes) -> bytes:
+    """
+    Split bytes into 8x8 panels and rearrange
+    them to display correctly on a specific
+    square configuration.
+    """
     w = 8 * 3
     h = 8 * 3
     out = [b''] * 9
-    print('LEN:', len(im))
+    #print('LEN:', len(im))
     for j in range(0, len(im), 8*3):
         x = (j // (8*3)) % 3
         y = (j // (8*8*9)) % 3
         n = x + y * 3
-        #if j < (8 * 8 * 3):
         dir_ = (j // (8*9)) & 1
         if dir_:
             out[n] += im[j:j+8*3]
         else:
             out[n] += rev(im[j:j+8*3])
-        print(j, x, y)
+        #print(j, x, y)
     for i in range(9):
-        print('LEN panel:', len(out[i]))
+        #print('LEN panel:', len(out[i]))
         out[i] += b'\x00' * ((8*8*3) - len(out[i]))
-        print('NEW:', len(out[i]))
-    # shuffle(out)
+        #print('NEW:', len(out[i]))
     out = sort_panels(out)
     return b''.join(out)
 
