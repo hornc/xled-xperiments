@@ -10,6 +10,7 @@ from pygame.locals import (
     KEYDOWN,
     QUIT,
 )
+from requests.exceptions import ConnectTimeout, HTTPError
 from xled.control import ControlInterface
 from xled.discover import discover
 
@@ -17,19 +18,23 @@ from test import panels
 
 
 #BACKGROUND = "img/test.png"
+#BACKGROUND = "img/pyrrhia.png"
 BACKGROUND = "img/pantala.png"
+
 COLOR = (250, 250, 0)  # player pixel color
 
 
 def display(im, disp, coords):
-    #print('TYPE:', type(im))
-    #print('TYPE:', type(im.get_view('3')))
-    #print('pixel size', im.get_bytesize())
     raw = im.get_view('3')
     raw = pygame.image.tostring(im, 'RGB') 
-    #print('IMAGE:', raw)
     out = panels(raw)
-    disp.set_rt_frame_rest(out)
+    try:
+        disp.set_rt_frame_rest(out)
+    except ConnectTimeout as e:
+        print(f'EXCEPTION_1a: {e}', flush=True)
+        raise e
+    except HTTPError as e:
+        print(f'EXCEPTION_1b: {e}', flush=True)
 
 
 def main():
@@ -65,9 +70,15 @@ def main():
         screen.set_at((x, y), COLOR)
 
         # Send image to the pixel grid
-        display(screen, a, coords)
+        try:
+            display(screen, a, coords)
+        except ConnectTimeout as e:
+            print(f'EXCEPTION_2: {e}', flush=True)
+            # reset interface?
+            pygame.time.wait(5000)
+            a = ControlInterface(ip_)
+            a.set_mode('rt')
         pygame.display.flip()
-        #pygame.time.delay(10)
         clock.tick(30)
     pygame.quit()
 
