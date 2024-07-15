@@ -30,11 +30,8 @@ def display(im, disp, coords):
     out = panels(raw)
     try:
         disp.set_rt_frame_rest(out)
-    except ConnectTimeout as e:
-        print(f'EXCEPTION_1a: {e}', flush=True)
-        raise e
     except HTTPError as e:
-        print(f'EXCEPTION_1b: {e}', flush=True)
+        print(f'EXCEPTION_1b: {e}')
 
 
 def main():
@@ -73,8 +70,8 @@ def main():
         try:
             display(screen, a, coords)
         except ConnectTimeout as e:
-            print(f'EXCEPTION_2: {e}', flush=True)
-            # reset interface?
+            print(f'EXCEPTION_2: {e}')
+            # reset interface
             pygame.time.wait(5000)
             a = ControlInterface(ip_)
             a.set_mode('rt')
