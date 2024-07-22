@@ -10,11 +10,11 @@ from pygame.locals import (
     KEYDOWN,
     QUIT,
 )
-from requests.exceptions import ConnectTimeout, HTTPError
+from requests.exceptions import ConnectTimeout
 from xled.control import ControlInterface
 from xled.discover import discover
 
-from test import panels
+from led_game import display
 
 
 #BACKGROUND = "img/test.png"
@@ -22,20 +22,6 @@ from test import panels
 BACKGROUND = "img/pantala.png"
 
 COLOR = (250, 250, 0)  # player pixel color
-BRIGHTNESS = 0.25  # Default brightness of the the xled display output
-GAMMA = 2.2
-
-
-def display(im, disp, coords, brightness=BRIGHTNESS):
-    b = 255 * brightness ** GAMMA
-    d = im.copy()
-    d.fill((b,)*3, special_flags=pygame.BLEND_RGB_MULT)
-    raw = pygame.image.tostring(d, 'RGB')
-    out = panels(raw)
-    try:
-        disp.set_rt_frame_rest(out)
-    except HTTPError as e:
-        print(f'EXCEPTION_1b: {e}')
 
 
 def main():
@@ -56,7 +42,7 @@ def main():
     x = y = 5  # coords of player
     while running:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:  # Window close
+            if event.type == QUIT:  # Window close
                 running = False
         screen.blit(bg, [0, 0])
         # Check user input...

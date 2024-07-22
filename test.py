@@ -100,6 +100,7 @@ def panels(im:bytes) -> bytes:
 
 
 def display(im, disp, coords):
+    # Displays a PIL image in RT mode
     raw = im.tobytes()
     out = panels(raw)
     disp.set_rt_frame_rest(out)

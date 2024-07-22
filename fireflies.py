@@ -6,7 +6,7 @@ from random import choice, randint
 from xled.control import ControlInterface
 from xled.discover import discover
 
-from test import panels
+from led_game import display
 
 
 BACKGROUND = 'img/firefly-jar.png'
@@ -14,16 +14,11 @@ EMPTY = (127, 176, 191, 255)  # Jar bgcolor
 FIREFLIES = 20
 
 
-def ff_rgb(color_range=150):
-    """Choose a random firefly color."""
-    return tuple(randint(255 - color_range, 255) for i in range(3))
-
-
 class Firefly:
     def __init__(self):
-        self.x = 13
-        self.y = 13
-        self.color = ff_rgb()
+        self.x, self.y = 13, 13
+        self.color = pygame.Color(0, 0, 0)
+        self.color.hsla = (randint(0, 360), 100, 50, 0)
 
     def move(self, screen):
         adj = [(self.x, self.y)]
@@ -37,13 +32,6 @@ class Firefly:
 
     def draw(self, screen):
         screen.set_at((self.x, self.y), self.color)
-
-
-def display(im, disp, coords):
-    raw = im.get_view('3')
-    raw = pygame.image.tostring(im, 'RGB') 
-    out = panels(raw)
-    disp.set_rt_frame_rest(out)
 
 
 def main():
@@ -61,7 +49,7 @@ def main():
     fireflies = [Firefly() for i in range(FIREFLIES)]
     while running:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 running = False
         screen.blit(bg, [0, 0])
 
