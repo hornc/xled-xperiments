@@ -22,11 +22,15 @@ from test import panels
 BACKGROUND = "img/pantala.png"
 
 COLOR = (250, 250, 0)  # player pixel color
+BRIGHTNESS = 0.25  # Default brightness of the the xled display output
+GAMMA = 2.2
 
 
-def display(im, disp, coords):
-    raw = im.get_view('3')
-    raw = pygame.image.tostring(im, 'RGB') 
+def display(im, disp, coords, brightness=BRIGHTNESS):
+    b = 255 * brightness ** GAMMA
+    d = im.copy()
+    d.fill((b,)*3, special_flags=pygame.BLEND_RGB_MULT)
+    raw = pygame.image.tostring(d, 'RGB')
     out = panels(raw)
     try:
         disp.set_rt_frame_rest(out)
@@ -39,10 +43,12 @@ def main():
     ip_ = discover().ip_address
     a = ControlInterface(ip_)
     a.set_mode('rt')
+    print(f'Initial brightness:', a.get_brightness().data)
+    print(f'Saturation:', a.get_saturation().data)
 
     d = a.get_led_layout().data
     coords = d['coordinates']
-    clock = pygame.time.Clock() 
+    clock = pygame.time.Clock()
     screen = pygame.display.set_mode([24, 24], flags=pygame.SCALED)
     bg = pygame.image.load(BACKGROUND)
     pygame.key.set_repeat(10, 10)
@@ -53,7 +59,7 @@ def main():
             if event.type == pygame.QUIT:  # Window close
                 running = False
         screen.blit(bg, [0, 0])
-        # Check user input... 
+        # Check user input...
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[K_UP]:
             y -= 1
