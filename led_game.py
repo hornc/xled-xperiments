@@ -121,7 +121,7 @@ class Display(ControlInterface):
     def svglayout(self):
         """
         Writes the layout of the LED matrix to a SVG file (<path>)
-        to insprect how the LEDs are organised.
+        to inspect how the LEDs are organised.
         """
         w = 300
         h = 200
