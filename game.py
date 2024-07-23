@@ -10,11 +10,8 @@ from pygame.locals import (
     KEYDOWN,
     QUIT,
 )
-from requests.exceptions import ConnectTimeout
-from xled.control import ControlInterface
-from xled.discover import discover
 
-from led_game import display
+from led_game import Display
 
 
 #BACKGROUND = "img/test.png"
@@ -26,16 +23,10 @@ COLOR = (250, 250, 0)  # player pixel color
 
 def main():
     pygame.init()
-    ip_ = discover().ip_address
-    a = ControlInterface(ip_)
-    a.set_mode('rt')
-    print(f'Initial brightness:', a.get_brightness().data)
-    print(f'Saturation:', a.get_saturation().data)
-
-    d = a.get_led_layout().data
-    coords = d['coordinates']
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode([24, 24], flags=pygame.SCALED)
+
+    a = Display()
+    screen = a.screen
     bg = pygame.image.load(BACKGROUND)
     pygame.key.set_repeat(10, 10)
     running = True
@@ -58,16 +49,9 @@ def main():
         # Draw player pixel
         screen.set_at((x, y), COLOR)
 
-        # Send image to the pixel grid
-        try:
-            display(screen, a, coords)
-        except ConnectTimeout as e:
-            print(f'EXCEPTION_2: {e}')
-            # reset interface
-            pygame.time.wait(5000)
-            a = ControlInterface(ip_)
-            a.set_mode('rt')
-        pygame.display.flip()
+        # display both the pygame screen AND send data to LED matrix:
+        a.display()
+
         clock.tick(30)
     pygame.quit()
 

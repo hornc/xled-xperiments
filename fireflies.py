@@ -3,10 +3,8 @@
 import pygame
 from pygame.locals import QUIT
 from random import choice, randint
-from xled.control import ControlInterface
-from xled.discover import discover
 
-from led_game import display
+from led_game import Display
 
 
 BACKGROUND = 'img/firefly-jar.png'
@@ -36,14 +34,10 @@ class Firefly:
 
 def main():
     pygame.init()
-    ip_ = discover().ip_address
-    a = ControlInterface(ip_)
-    a.set_mode('rt')
+    a = Display()
 
-    d = a.get_led_layout().data
-    coords = d['coordinates']
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode([24, 24], flags=pygame.SCALED)
+    screen = a.screen
     bg = pygame.image.load(BACKGROUND)
     running = True
     fireflies = [Firefly() for i in range(FIREFLIES)]
@@ -59,8 +53,7 @@ def main():
             firefly.draw(screen)
 
         # send an image to the pixel grid
-        display(screen, a, coords)
-        pygame.display.flip()
+        a.display()
         clock.tick(30)
     pygame.quit()
 
